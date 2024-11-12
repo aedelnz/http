@@ -27,8 +27,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import okhttp3.Call
 import okhttp3.FormBody
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
@@ -146,10 +149,11 @@ class MainActivity2 : AppCompatActivity() {
             showNotification("Error", "All request parameters must be provided")
             return
         }
-
-        val requestBody = FormBody.Builder()
-            .add("post", requestParams.postData)
-            .build()
+        val requestBody: RequestBody = if (requestParams.postData.isNotEmpty()) {
+            requestParams.postData.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+        } else {
+            FormBody.Builder().build()
+        }
 
         val requestBuilder = Request.Builder()
             .url(requestParams.url)
